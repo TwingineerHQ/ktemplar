@@ -1,0 +1,18 @@
+[versions]
+kotlin = "2.0.0"
+kotlin-logging = "7.0.0"
+kotlinx-html = "0.11.0"
+slf4j = "2.0.13"
+terpal = "2.0.0-0.2.0"
+
+[libraries]
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-html-common = { module = "org.jetbrains.kotlinx:kotlinx-html", version.ref = "kotlinx-html" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+terpal-runtime = { module = "io.exoquery:terpal-runtime", version.ref = "terpal" }
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+terpal = { id = "io.exoquery.terpal-plugin", version.ref = "terpal" }
