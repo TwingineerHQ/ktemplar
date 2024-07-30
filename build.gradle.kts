@@ -38,17 +38,13 @@ kotlin {
                 implementation(project.dependencies.platform(libs.kotlin.bom))
 
                 implementation(libs.kotlin.logging)
+                implementation(libs.terpal.runtime)
                 implementation(libs.kotlinx.html.common)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-            }
-        }
-        val jvmMain by getting {
-            dependencies {
-                implementation(libs.terpal.runtime)
             }
         }
         val jvmTest by getting {

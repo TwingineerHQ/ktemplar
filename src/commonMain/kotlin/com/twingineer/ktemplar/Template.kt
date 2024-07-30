@@ -1,22 +1,132 @@
 package com.twingineer.ktemplar
 
+import com.twingineer.ktemplar.StandardTemplateType.*
+import io.exoquery.terpal.Interpolator
+import io.exoquery.terpal.Messages
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.html.stream.appendHTML
 import kotlin.jvm.JvmInline
 import kotlin.reflect.KClass
 
+private val logger = KotlinLogging.logger {}
+
 public inline fun template(block: TemplateScope.() -> Unit): String =
-    StandardTemplateType.CHECKED.build(block)
+    CHECKED.build(block)
 
 public inline fun template(out: Appendable, block: TemplateScope.() -> Unit): Unit =
-    StandardTemplateType.CHECKED.build(out, block)
+    CHECKED.build(out, block)
 
 public inline fun StandardTemplateType.build(block: TemplateScope.() -> Unit): String =
     buildString { build(this, block) }
 
 public expect inline fun StandardTemplateType.build(out: Appendable, block: TemplateScope.() -> Unit)
 
-public expect interface Appender<T, R> {
-    public open operator fun invoke(string: String): R
+internal inline fun StandardTemplateType.buildInternal(out: Appendable, block: TemplateScope.() -> Unit) {
+    val scope = when (this) {
+        CHECKED, HTML -> CheckedTemplateScope(out)
+        UNCHECKED -> UncheckedTemplateScope(out)
+    }
+    scope.block()
+}
+
+public interface Appender {
+    public operator fun invoke(string: String)
+}
+
+public abstract class InterpolatingAppender(
+    private val out: Appendable,
+    private val marginPrefix: String = "|",
+) : Interpolator<Any?, Unit>, Appender {
+
+    init {
+        require(marginPrefix.isNotBlank()) { "marginPrefix must be non-blank string." }
+    }
+
+    private val marginReplace = " ".repeat(marginPrefix.length)
+
+    protected abstract fun Appendable.appendParameter(parameter: TemplateParameter<*>)
+
+    override fun interpolate(parts: () -> List<String>, params: () -> List<Any?>) {
+        with(out) {
+            var firstLineSkipped = false
+            var indentTrim: Int? = null
+            fun appendTrimmed(value: CharSequence, skipLast: Boolean = false) {
+                val linesIter = value.lineSequence().iterator()
+                var line = linesIter.next()
+                var indentWidth = line.indentWidth()
+                var doTrim = false
+                var doBreak = false
+
+                if (indentTrim == null) {
+                    if (!firstLineSkipped && indentWidth == line.length) {
+                        firstLineSkipped = true
+                        if (!linesIter.hasNext())
+                            return
+
+                        line = linesIter.next()
+                        indentWidth = line.indentWidth()
+                    }
+                    indentTrim = indentWidth
+                    doTrim = true
+                }
+
+                do {
+                    val hasNext = linesIter.hasNext()
+                    if (doTrim) {
+                        val startIndex = if (indentWidth < indentTrim!!) {
+                            if (!skipLast || hasNext)
+                                logger.debug { "Tried to trim indentation of width $indentTrim but only $indentWidth present." }
+                            indentWidth
+                        } else indentTrim!!
+
+                        val prefixed = startIndex < line.length &&
+                                line.subSequence(startIndex, startIndex + marginPrefix.length) == marginPrefix
+
+                        if (prefixed) {
+                            if (doBreak)
+                                out.append('\n')
+                            out.append(marginReplace)
+                            out.append(line.subSequence(startIndex + marginPrefix.length, line.length))
+                        } else if (skipLast && !hasNext && line.subSequence(startIndex, line.length).isBlank()) {
+                            // no-op
+                        } else {
+                            if (doBreak)
+                                out.append('\n')
+                            out.append(line.subSequence(startIndex, line.length))
+                        }
+                    } else {
+                        out.append(line)
+                    }
+
+                    if (!hasNext)
+                        break
+                    line = linesIter.next()
+                    indentWidth = line.indentWidth()
+                    doBreak = true
+                    doTrim = true
+                } while (true)
+            }
+
+            val partsIter = parts().iterator()
+            val paramsIter = params().iterator()
+            while (partsIter.hasNext()) {
+                val part = partsIter.next()
+                val onLastPart = !partsIter.hasNext()
+                appendTrimmed(part, skipLast = onLastPart)
+                if (paramsIter.hasNext()) {
+                    when (val param = paramsIter.next()) {
+                        is TemplateParameter<*> ->
+                            if (param.isRaw) param.value.toString()
+                            else appendParameter(param)
+
+                        else -> throw IllegalArgumentException("Non-parametrized string after '${part.takeLast(100)}'")
+                    }
+                } else check(onLastPart)
+            }
+        }
+    }
+
+    override operator fun invoke(string: String): Unit = Messages.throwPluginNotExecuted()
 }
 
 public enum class StandardTemplateType {
@@ -42,7 +152,7 @@ public sealed interface TemplateScope {
 }
 
 public abstract class TemplateScopeBase protected constructor(internal val out: Appendable) : TemplateScope {
-    internal val appenders: MutableMap<KClass<*>, Appender<*, *>> = mutableMapOf()
+    internal val appenders: MutableMap<KClass<*>, Appender> = mutableMapOf()
 
     internal abstract fun copy(out: Appendable): TemplateScopeBase
 }
@@ -89,13 +199,13 @@ private val uncheckedEmpty: TemplateParameter<Unit> =
     UncheckedTemplateParameter(TemplateRaw(""), null)
 
 private fun <V> paramOf(value: V): TemplateParameter<V> =
-    SafeTemplateParameter(value)
+    CheckedTemplateParameter(value)
 
 private fun <V> rawOf(value: V): TemplateParameter<V> =
-    SafeTemplateParameter(TemplateRaw(value))
+    CheckedTemplateParameter(TemplateRaw(value))
 
 private val empty: TemplateParameter<Unit> =
-    SafeTemplateParameter(TemplateRaw(""))
+    CheckedTemplateParameter(TemplateRaw(""))
 
 public fun (TemplateScope.() -> Unit).indent(size: Int): (TemplateScope.() -> Unit) = {
     (this as TemplateScopeBase).copy(IndentingAppendable(out, size)).this@indent()
@@ -111,7 +221,7 @@ private fun <V> TemplateParameter<V>.valueOf(value: Any?): V =
     (if (isRaw) (value as TemplateRaw<*>).value else value) as V
 
 @JvmInline
-private value class SafeTemplateParameter<out V>(
+private value class CheckedTemplateParameter<out V>(
     private val inlineValue: Any?,
 ) : TemplateParameter<V> {
     override val value: V
@@ -145,13 +255,7 @@ private data class TemplateRaw<out V>(
     val value: V,
 )
 
-@Suppress("unused")
-public interface IAppender<T, R> {
-    public operator fun invoke(string: String): R =
-        throw UnsupportedOperationException()
-}
-
-public open class UnsafeAppender(private val out: Appendable) : IAppender<Any, Unit> {
+public open class UnsafeAppender(private val out: Appendable) : Appender {
     override operator fun invoke(string: String) {
         out.append(string.trimMarginOrIndent())
     }
