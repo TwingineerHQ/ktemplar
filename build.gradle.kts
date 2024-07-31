@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jreleaser.model.Active
 
 group = "com.twingineer"
@@ -109,6 +107,10 @@ jreleaser {
     project {
         copyright.set("Twingineer")
         strict = true
+    }
+    signing {
+        active.set(Active.ALWAYS)
+        armored.set(true)
     }
     deploy {
         maven {
