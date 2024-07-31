@@ -130,7 +130,7 @@ public abstract class TemplateScopeBase protected constructor(internal val out: 
     internal abstract fun copy(out: Appendable): TemplateScopeBase
 }
 
-public class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
+public open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
 
     override fun <V> V.param(): TemplateParameter<V> =
         CheckedTemplateParameter(this)
@@ -139,13 +139,13 @@ public class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
         CheckedTemplateParameter(TemplateRaw(this))
 
     override val empty: TemplateParameter<Unit>
-        get() = Companion.empty
+        get() = EMPTY
 
     override fun copy(out: Appendable): TemplateScopeBase =
         CheckedTemplateScope(out)
 
     private companion object {
-        private val empty: CheckedTemplateParameter<Unit> =
+        private val EMPTY: CheckedTemplateParameter<Unit> =
             CheckedTemplateParameter(TemplateRaw(""))
     }
 }
