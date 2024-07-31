@@ -125,8 +125,10 @@ jreleaser {
             mavenCentral {
                 create("sonatype") {
                     active.set(Active.ALWAYS)
-                    // pomchecker errors with `Unknown packaging: klib`
+                    // doesn't know about klib packaging, so insists on finding a jar
                     applyMavenCentralRules.set(false)
+                    // pomchecker errors with `Unknown packaging: klib`
+                    verifyPom.set(false)
                     url.set("https://central.sonatype.com/api/v1/publisher")
                     stagingRepository("build/staging-deploy")
                 }
