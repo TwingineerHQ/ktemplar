@@ -83,6 +83,15 @@ publishing {
                 }
             }
 
+            developers {
+                developer {
+                    name.set("Twingineer")
+                    email.set("solutions@twingineer.com")
+                    organization.set("Twingineer")
+                    organizationUrl.set("https://twingineer.com")
+                }
+            }
+
             organization {
                 name.set("Twingineer")
                 url.set("https://twingineer.com")
@@ -106,7 +115,6 @@ publishing {
 jreleaser {
     project {
         copyright.set("Twingineer")
-        strict = true
     }
     signing {
         active.set(Active.ALWAYS)
