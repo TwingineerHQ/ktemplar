@@ -1,7 +1,7 @@
 import org.jreleaser.model.Active
 
 group = "com.twingineer"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
@@ -129,7 +129,6 @@ jreleaser {
                     applyMavenCentralRules.set(false)
                     url.set("https://central.sonatype.com/api/v1/publisher")
                     stagingRepository("build/staging-deploy")
-                    snapshotSupported = true
                 }
             }
         }

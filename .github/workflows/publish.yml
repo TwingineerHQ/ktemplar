@@ -16,7 +16,7 @@ jobs:
           distribution: 'adopt'
       - name: Publish package to local staging directory
         run: ./gradlew :publish
-      - name: Publish package to maven central
+      - name: Publish package to Maven Central
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY_5C5E01C6 }}
