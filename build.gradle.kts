@@ -1,4 +1,4 @@
-import org.jreleaser.model.Active
+import com.vanniktech.maven.publish.SonatypeHost
 
 group = "com.twingineer"
 version = "0.1.0"
@@ -6,11 +6,9 @@ description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
     alias(libs.plugins.dokka)
-    alias(libs.plugins.jreleaser)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.maven.publish)
     alias(libs.plugins.terpal) // for test compilation
-    `maven-publish`
-    signing
 }
 
 repositories {
@@ -66,73 +64,32 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     from(dokkaHtml.outputDirectory)
 }
 
-publishing {
-    publications.withType<MavenPublication> {
-        artifact(javadocJar)
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-        pom {
-            name.set("ktemplar")
-            description.set(project.description)
-            url.set("https://github.com/TwingineerHQ/ktemplar")
-
-            licenses {
-                license {
-                    name.set("Apache-2.0")
-                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    distribution.set("repo")
-                }
+    pom {
+        name.set("Ktemplar")
+        description.set(project.description)
+        url.set("https://github.com/TwingineerHQ/ktemplar")
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("repo")
             }
-
-            developers {
-                developer {
-                    name.set("Twingineer")
-                    email.set("solutions@twingineer.com")
-                    organization.set("Twingineer")
-                    organizationUrl.set("https://twingineer.com")
-                }
-            }
-
-            organization {
+        }
+        developers {
+            developer {
                 name.set("Twingineer")
                 url.set("https://twingineer.com")
             }
-
-            scm {
-                connection.set("scm:git:git://github.com/TwingineerHQ/ktemplar.git")
-                developerConnection.set("scm:git:ssh://github.com:TwingineerHQ/ktemplar.git")
-                url.set("https://github.com/TwingineerHQ/ktemplar/tree/main")
-            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/TwingineerHQ/ktemplar.git")
+            developerConnection.set("scm:git:ssh://github.com:TwingineerHQ/ktemplar.git")
+            url.set("https://github.com/TwingineerHQ/ktemplar/tree/main")
         }
     }
 
-    repositories {
-        maven {
-            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
-        }
-    }
-}
-
-jreleaser {
-    project {
-        copyright.set("Twingineer")
-    }
-    signing {
-        active.set(Active.ALWAYS)
-        armored.set(true)
-    }
-    deploy {
-        maven {
-            mavenCentral {
-                create("sonatype") {
-                    active.set(Active.ALWAYS)
-                    // doesn't know about klib packaging, so insists on finding a jar
-                    applyMavenCentralRules.set(false)
-                    // pomchecker errors with `Unknown packaging: klib`
-                    verifyPom.set(false)
-                    url.set("https://central.sonatype.com/api/v1/publisher")
-                    stagingRepository("build/staging-deploy")
-                }
-            }
-        }
-    }
+    signAllPublications()
 }

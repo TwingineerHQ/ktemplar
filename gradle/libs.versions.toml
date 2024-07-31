@@ -4,6 +4,7 @@ jreleaser = "1.13.1"
 kotlin = "2.0.0"
 kotlin-logging = "7.0.0"
 kotlinx-html = "0.11.0"
+maven-publish = "0.29.0"
 slf4j = "2.0.13"
 terpal = "2.0.0-1.0.0-RC1"
 
@@ -19,4 +20,5 @@ terpal-runtime = { module = "io.exoquery:terpal-runtime", version.ref = "terpal"
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 terpal = { id = "io.exoquery.terpal-plugin", version.ref = "terpal" }
