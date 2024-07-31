@@ -21,4 +21,4 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY_5C5E01C6 }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID_5C5E01C6 }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE_5C5E01C6 }}
-        run: ./gradlew :publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew :publishAllPublicationsToMavenCentralRepository --stacktrace
