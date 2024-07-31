@@ -98,8 +98,8 @@ publishing {
             }
 
             scm {
-                connection.set("scm:git:git@github.com:TwingineerHQ/ktemplar.git")
-                developerConnection.set("scm:git:ssh:git@github.com:TwingineerHQ/ktemplar.git")
+                connection.set("scm:git:git://github.com/TwingineerHQ/ktemplar.git")
+                developerConnection.set("scm:git:ssh://github.com:TwingineerHQ/ktemplar.git")
                 url.set("https://github.com/TwingineerHQ/ktemplar/tree/main")
             }
         }
@@ -125,7 +125,8 @@ jreleaser {
             mavenCentral {
                 create("sonatype") {
                     active.set(Active.ALWAYS)
-                    applyMavenCentralRules.set(true)
+                    // pomchecker errors with `Unknown packaging: klib`
+//                    applyMavenCentralRules.set(true)
                     url.set("https://central.sonatype.com/api/v1/publisher")
                     stagingRepository("build/staging-deploy")
                     snapshotSupported = true
