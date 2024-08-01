@@ -178,6 +178,9 @@ private data class TemplateRaw<out V>(
     val value: V,
 )
 
+public val TemplateScope.raw: Appender
+    get() = UnsafeAppender((this as TemplateScopeBase).out)
+
 @Suppress("unused")
 internal open class UnsafeAppender(private val out: Appendable) : Appender {
     override operator fun invoke(string: String) {
