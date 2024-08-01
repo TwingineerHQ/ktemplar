@@ -1,7 +1,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 group = "com.twingineer"
-version = "0.1.0"
+version = "0.1.1-SNAPSHOT"
 description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
@@ -16,6 +16,7 @@ repositories {
 }
 
 kotlin {
+    jvmToolchain(11)
     explicitApi()
 
     jvm {
@@ -42,6 +43,7 @@ kotlin {
                 implementation(libs.kotlin.logging)
                 implementation(libs.terpal.runtime)
                 implementation(libs.kotlinx.html.common)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
         val commonTest by getting {

@@ -4,6 +4,7 @@ jreleaser = "1.13.1"
 kotlin = "2.0.0"
 kotlin-logging = "7.0.0"
 kotlinx-html = "0.11.0"
+kotlinx-serialization-json = "1.7.1"
 maven-publish = "0.29.0"
 slf4j = "2.0.13"
 terpal = "2.0.0-1.0.0-RC1"
@@ -13,6 +14,7 @@ kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-html-common = { module = "org.jetbrains.kotlinx:kotlinx-html", version.ref = "kotlinx-html" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 terpal-runtime = { module = "io.exoquery:terpal-runtime", version.ref = "terpal" }
 
