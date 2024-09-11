@@ -110,7 +110,7 @@ public abstract class InterpolatingAppender(
     override operator fun invoke(string: String): Unit = Messages.throwPluginNotExecuted()
 }
 
-public sealed interface TemplateScope {
+public interface TemplateScope : Appendable {
 
     public fun <V> V.param(): TemplateParameter<V>
 
@@ -121,13 +121,11 @@ public sealed interface TemplateScope {
 
     public operator fun <V> V.unaryMinus(): TemplateParameter<V> =
         this.param()
-
-    public val empty: TemplateParameter<Unit>
 }
 
-public abstract class TemplateScopeBase protected constructor(internal val out: Appendable) : TemplateScope {
+public abstract class TemplateScopeBase protected constructor(public val out: Appendable) : TemplateScope, Appendable by out {
 
-    internal abstract fun copy(out: Appendable): TemplateScopeBase
+    public abstract fun copy(out: Appendable): TemplateScopeBase
 }
 
 public open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
@@ -138,16 +136,8 @@ public open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out)
     override fun <V> V.raw(): TemplateParameter<V> =
         CheckedTemplateParameter(TemplateRaw(this))
 
-    override val empty: TemplateParameter<Unit>
-        get() = EMPTY
-
     override fun copy(out: Appendable): TemplateScopeBase =
         CheckedTemplateScope(out)
-
-    private companion object {
-        private val EMPTY: CheckedTemplateParameter<Unit> =
-            CheckedTemplateParameter(TemplateRaw(""))
-    }
 }
 
 public fun (TemplateScope.() -> Unit).indent(size: Int): (TemplateScope.() -> Unit) = {
@@ -160,7 +150,7 @@ public interface TemplateParameter<out V> {
 }
 
 @JvmInline
-private value class CheckedTemplateParameter<out V>(
+internal value class CheckedTemplateParameter<out V>(
     private val inlineValue: Any?,
 ) : TemplateParameter<V> {
     override val value: V
@@ -174,7 +164,7 @@ private value class CheckedTemplateParameter<out V>(
         throw UnsupportedOperationException()
 }
 
-private data class TemplateRaw<out V>(
+internal data class TemplateRaw<out V>(
     val value: V,
 )
 

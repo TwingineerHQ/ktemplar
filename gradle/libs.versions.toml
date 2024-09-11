@@ -1,13 +1,12 @@
 [versions]
 dokka = "1.9.20"
-jreleaser = "1.13.1"
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 kotlin-logging = "7.0.0"
 kotlinx-html = "0.11.0"
-kotlinx-serialization-json = "1.7.1"
+kotlinx-serialization-json = "1.7.2"
 maven-publish = "0.29.0"
 slf4j = "2.0.13"
-terpal = "2.0.0-1.0.0-RC1"
+terpal = "2.0.20-1.0.0-RC3"
 
 [libraries]
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
@@ -20,7 +19,6 @@ terpal-runtime = { module = "io.exoquery:terpal-runtime", version.ref = "terpal"
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 terpal = { id = "io.exoquery.terpal-plugin", version.ref = "terpal" }
