@@ -1,7 +1,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 group = "com.twingineer"
-version = "0.1.1"
+version = "0.1.2-SNAPSHOT"
 description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
@@ -41,9 +41,10 @@ kotlin {
                 implementation(project.dependencies.platform(libs.kotlin.bom))
 
                 implementation(libs.kotlin.logging)
-                implementation(libs.terpal.runtime)
                 implementation(libs.kotlinx.html.common)
                 implementation(libs.kotlinx.serialization.json)
+
+                compileOnly(libs.terpal.runtime)
             }
         }
         val commonTest by getting {
@@ -60,7 +61,7 @@ kotlin {
 }
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+val javadocJar by tasks.registering(Jar::class) {
     dependsOn(dokkaHtml)
     archiveClassifier.set("javadoc")
     from(dokkaHtml.outputDirectory)
