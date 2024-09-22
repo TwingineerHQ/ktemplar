@@ -1,5 +1,6 @@
 [versions]
 dokka = "1.9.20"
+jetbrains-annotations = "24.1.0"
 kotlin = "2.0.20"
 kotlin-logging = "7.0.0"
 kotlinx-html = "0.11.0"
@@ -9,6 +10,7 @@ slf4j = "2.0.13"
 terpal = "2.0.20-1.0.0-RC3"
 
 [libraries]
+jetbrains-annotations = { module = "com.sschr15.annotations:jb-annotations-kmp", version.ref = "jetbrains-annotations" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

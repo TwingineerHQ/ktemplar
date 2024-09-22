@@ -107,7 +107,7 @@ public abstract class InterpolatingAppender(
         }
     }
 
-    override operator fun invoke(string: String): Unit = Messages.throwPluginNotExecuted()
+    override operator fun invoke(fragment: String): Unit = Messages.throwPluginNotExecuted()
 }
 
 public interface TemplateScope : Appendable {
