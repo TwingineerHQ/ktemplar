@@ -26,7 +26,7 @@ class HtmlTest {
         val name = "<script>console.log('Uh oh');</script>"
         val value = buildString {
             appendTemplate {
-                html(
+                html.invoke(
                     """
                     Hello, $name!
                 """
