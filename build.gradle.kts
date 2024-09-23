@@ -40,11 +40,11 @@ kotlin {
             dependencies {
                 implementation(project.dependencies.platform(libs.kotlin.bom))
 
+                implementation(libs.jetbrains.annotations)
                 implementation(libs.kotlin.logging)
                 implementation(libs.kotlinx.html.common)
                 implementation(libs.kotlinx.serialization.json)
 
-                compileOnly(libs.jetbrains.annotations)
                 compileOnly(libs.terpal.runtime)
             }
         }

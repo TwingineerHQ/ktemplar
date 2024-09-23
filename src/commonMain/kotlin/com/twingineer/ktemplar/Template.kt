@@ -1,23 +1,23 @@
 package com.twingineer.ktemplar
 
-import io.exoquery.terpal.Interpolator
+import io.exoquery.terpal.InterpolatorBackend
 import io.exoquery.terpal.Messages
+import io.exoquery.terpal.ProtoInterpolator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.jvm.JvmInline
 
 private val logger = KotlinLogging.logger {}
 
-public inline fun Appendable.appendTemplate(block: TemplateScope.() -> Unit): Unit =
+public fun Appendable.appendTemplate(block: TemplateScope.() -> Unit): Unit =
     CheckedTemplateScope(this).block()
 
-public interface Appender {
-    public operator fun invoke(string: String)
+internal interface Appender {
+    operator fun TemplateScope.invoke(string: String)
 }
 
 public abstract class InterpolatingAppender(
-    private val out: Appendable,
     private val marginPrefix: String = "|",
-) : Interpolator<Any?, Unit>, Appender {
+) : ProtoInterpolator<Any?, Unit>, Appender {
 
     init {
         require(marginPrefix.isNotBlank()) { "marginPrefix must be non-blank string." }
@@ -27,8 +27,11 @@ public abstract class InterpolatingAppender(
 
     protected abstract fun Appendable.appendParameter(parameter: TemplateParameter<*>)
 
-    override fun interpolate(parts: () -> List<String>, params: () -> List<Any?>) {
-        with(out) {
+    override operator fun TemplateScope.invoke(string: String): Unit = Messages.throwPluginNotExecuted()
+
+    @InterpolatorBackend
+    public fun interpolate(parts: () -> List<String>, params: () -> List<Any?>, ctx: TemplateScope) {
+        with(ctx) {
             var firstLineSkipped = false
             var indentTrim: Int? = null
             fun appendTrimmed(value: CharSequence, skipLast: Boolean = false) {
@@ -65,18 +68,18 @@ public abstract class InterpolatingAppender(
 
                         if (prefixed) {
                             if (doBreak)
-                                out.append('\n')
-                            out.append(marginReplace)
-                            out.append(line.subSequence(startIndex + marginPrefix.length, line.length))
+                                append('\n')
+                            append(marginReplace)
+                            append(line.subSequence(startIndex + marginPrefix.length, line.length))
                         } else if (skipLast && !hasNext && line.subSequence(startIndex, line.length).isBlank()) {
                             // no-op
                         } else {
                             if (doBreak)
-                                out.append('\n')
-                            out.append(line.subSequence(startIndex, line.length))
+                                append('\n')
+                            append(line.subSequence(startIndex, line.length))
                         }
                     } else {
-                        out.append(line)
+                        append(line)
                     }
 
                     if (!hasNext)
@@ -106,8 +109,6 @@ public abstract class InterpolatingAppender(
             }
         }
     }
-
-    override operator fun invoke(fragment: String): Unit = Messages.throwPluginNotExecuted()
 }
 
 public interface TemplateScope : Appendable {
@@ -123,12 +124,13 @@ public interface TemplateScope : Appendable {
         this.param()
 }
 
-public abstract class TemplateScopeBase protected constructor(public val out: Appendable) : TemplateScope, Appendable by out {
+internal abstract class TemplateScopeBase protected constructor(public val out: Appendable) : TemplateScope,
+    Appendable by out {
 
-    public abstract fun copy(out: Appendable): TemplateScopeBase
+    abstract fun copy(out: Appendable): TemplateScopeBase
 }
 
-public open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
+internal open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
 
     override fun <V> V.param(): TemplateParameter<V> =
         CheckedTemplateParameter(this)
@@ -168,14 +170,8 @@ internal data class TemplateRaw<out V>(
     val value: V,
 )
 
-public val TemplateScope.raw: Appender
-    get() = UnsafeAppender((this as TemplateScopeBase).out)
-
-@Suppress("unused")
-internal open class UnsafeAppender(private val out: Appendable) : Appender {
-    override operator fun invoke(string: String) {
-        out.append(string.trimMarginOrIndent())
-    }
+public fun TemplateScope.raw(string: String) {
+    append(string.trimMarginOrIndent())
 }
 
 private class IndentingAppendable(private val out: Appendable, size: Int) : Appendable {
