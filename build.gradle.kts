@@ -1,7 +1,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 group = "com.twingineer"
-version = "0.1.3"
+version = "0.1.4"
 description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
@@ -40,11 +40,11 @@ kotlin {
             dependencies {
                 implementation(project.dependencies.platform(libs.kotlin.bom))
 
+                implementation(libs.jetbrains.annotations)
                 implementation(libs.kotlin.logging)
                 implementation(libs.kotlinx.html.common)
                 implementation(libs.kotlinx.serialization.json)
 
-                compileOnly(libs.jetbrains.annotations)
                 compileOnly(libs.terpal.runtime)
             }
         }

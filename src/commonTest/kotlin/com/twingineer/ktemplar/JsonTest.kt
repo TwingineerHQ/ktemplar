@@ -10,7 +10,7 @@ class JsonTest {
         val name = "World"
         val value = buildString {
             appendTemplate {
-                json.invoke(
+                json(
                     """
                         { "Hello": "$name" }
                     """

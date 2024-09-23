@@ -7,7 +7,7 @@ kotlinx-html = "0.11.0"
 kotlinx-serialization-json = "1.7.2"
 maven-publish = "0.29.0"
 slf4j = "2.0.13"
-terpal = "2.0.20-1.0.0-RC3"
+terpal = "2.0.20-1.0.0-RC4"
 
 [libraries]
 jetbrains-annotations = { module = "com.sschr15.annotations:jb-annotations-kmp", version.ref = "jetbrains-annotations" }
