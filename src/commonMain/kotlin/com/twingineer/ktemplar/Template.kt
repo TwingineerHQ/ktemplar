@@ -122,13 +122,11 @@ public interface TemplateScope : Appendable {
 
     public operator fun <V> V.unaryMinus(): TemplateParameter<V> =
         this.param()
+
+    public fun copy(out: Appendable): TemplateScope
 }
 
-internal abstract class TemplateScopeBase protected constructor(public val out: Appendable) : TemplateScope,
-    Appendable by out {
-
-    abstract fun copy(out: Appendable): TemplateScopeBase
-}
+internal abstract class TemplateScopeBase protected constructor(val out: Appendable) : TemplateScope, Appendable by out
 
 internal open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
 
@@ -143,7 +141,7 @@ internal open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(ou
 }
 
 public fun (TemplateScope.() -> Unit).indent(size: Int): (TemplateScope.() -> Unit) = {
-    (this as TemplateScopeBase).copy(IndentingAppendable(out, size)).this@indent()
+    copy(IndentingAppendable(this, size)).this@indent()
 }
 
 public interface TemplateParameter<out V> {
