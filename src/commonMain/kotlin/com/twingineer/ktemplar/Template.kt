@@ -57,11 +57,11 @@ public abstract class InterpolatingAppender(
                 do {
                     val hasNext = linesIter.hasNext()
                     if (doTrim) {
-                        val startIndex = if (indentWidth < indentTrim!!) {
+                        val startIndex = if (indentWidth < indentTrim) {
                             if (!skipLast || hasNext)
                                 logger.debug { "Tried to trim indentation of width $indentTrim but only $indentWidth present." }
                             indentWidth
-                        } else indentTrim!!
+                        } else indentTrim
 
                         val prefixed = startIndex < line.length &&
                                 line.subSequence(startIndex, startIndex + marginPrefix.length) == marginPrefix
@@ -122,6 +122,12 @@ public interface TemplateScope : Appendable {
 
     public operator fun <V> V.unaryMinus(): TemplateParameter<V> =
         this.param()
+
+    public operator fun (TemplateScope.() -> Unit).unaryMinus(): TemplateParameter<*> =
+        include(this)
+
+    public operator fun (TemplateScope.() -> Unit).unaryPlus(): Unit =
+        invoke(this@TemplateScope)
 
     public fun copy(out: Appendable): TemplateScope
 }
