@@ -1,7 +1,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 group = "com.twingineer"
-version = "0.1.6"
+version = "0.1.7"
 description = "Fluent, safe templating in 100% Kotlin."
 
 plugins {
