@@ -123,16 +123,19 @@ public interface TemplateScope : Appendable {
     public operator fun <V> V.unaryMinus(): TemplateParameter<V> =
         this.param()
 
-    public operator fun (TemplateScope.() -> Unit).unaryMinus(): TemplateParameter<*> =
-        include(this)
-
-    public operator fun (TemplateScope.() -> Unit).unaryPlus(): Unit =
-        invoke(this@TemplateScope)
-
     public fun copy(out: Appendable): TemplateScope
 }
 
-internal abstract class TemplateScopeBase protected constructor(val out: Appendable) : TemplateScope, Appendable by out
+public inline infix fun TemplateScope.include(crossinline block: (TemplateScope.() -> Unit)): TemplateParameter<*> =
+    TemplateInclusion { this@include.block() }.param()
+
+public inline fun TemplateScope.indent(size: Int, crossinline block: (TemplateScope.() -> Unit)) {
+    with(copy(IndentingAppendable(this, size))) {
+        block()
+    }
+}
+
+internal abstract class TemplateScopeBase protected constructor(private val out: Appendable) : TemplateScope, Appendable by out
 
 internal open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(out) {
 
@@ -144,10 +147,6 @@ internal open class CheckedTemplateScope(out: Appendable) : TemplateScopeBase(ou
 
     override fun copy(out: Appendable): TemplateScopeBase =
         CheckedTemplateScope(out)
-}
-
-public fun (TemplateScope.() -> Unit).indent(size: Int): (TemplateScope.() -> Unit) = {
-    copy(IndentingAppendable(this, size)).this@indent()
 }
 
 public interface TemplateParameter<out V> {
@@ -178,7 +177,7 @@ public fun TemplateScope.raw(string: String) {
     append(string.trimMarginOrIndent())
 }
 
-private class IndentingAppendable(private val out: Appendable, size: Int) : Appendable {
+public class IndentingAppendable(private val out: Appendable, size: Int) : Appendable {
     private val find = '\n'
     private val findRegex = Regex("$find")
     private val indentation = " ".repeat(size)
@@ -229,12 +228,10 @@ private class IndentingAppendable(private val out: Appendable, size: Int) : Appe
     }
 }
 
-public fun TemplateScope.include(block: TemplateScope.() -> Unit): TemplateParameter<*> =
-    TemplateInclusion(this, block).param()
-
-private data class TemplateInclusion(private val builder: TemplateScope, val block: TemplateScope.() -> Unit) {
+@JvmInline
+public value class TemplateInclusion(private val block: () -> Unit) {
     override fun toString(): String {
-        builder.block()
+        block()
         return ""
     }
 }
