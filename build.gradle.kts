@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 group = "com.twingineer"
 version = "0.1.7"
 description = "Fluent, safe templating in 100% Kotlin."
@@ -19,9 +17,7 @@ kotlin {
     jvmToolchain(11)
     explicitApi()
 
-    jvm {
-        withJava()
-    }
+    jvm()
     js(IR) {
         browser {
             testTask {
@@ -61,15 +57,16 @@ kotlin {
     }
 }
 
-val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-val javadocJar by tasks.registering(Jar::class) {
-    dependsOn(dokkaHtml)
-    archiveClassifier.set("javadoc")
-    from(dokkaHtml.outputDirectory)
+tasks {
+    val javadocJar by registering(Jar::class) {
+        dependsOn(dokkaHtml)
+        archiveClassifier.set("javadoc")
+        from(dokkaHtml)
+    }
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
 
     pom {
         name.set("Ktemplar")
