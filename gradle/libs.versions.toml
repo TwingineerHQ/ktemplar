@@ -1,13 +1,13 @@
 [versions]
-dokka = "1.9.20"
+dokka = "2.0.0"
 jetbrains-annotations = "24.1.0"
-kotlin = "2.0.20"
-kotlin-logging = "7.0.0"
-kotlinx-html = "0.11.0"
-kotlinx-serialization-json = "1.7.2"
-maven-publish = "0.29.0"
-slf4j = "2.0.13"
-terpal = "2.0.20-1.0.0.PL"
+kotlin = "2.2.0"
+kotlin-logging = "7.0.11"
+kotlinx-html = "0.12.0"
+kotlinx-serialization-json = "1.9.0"
+maven-publish = "0.34.0"
+slf4j = "2.0.17"
+terpal = "2.2.0-2.0.0.PL"
 
 [libraries]
 jetbrains-annotations = { module = "com.sschr15.annotations:jb-annotations-kmp", version.ref = "jetbrains-annotations" }
