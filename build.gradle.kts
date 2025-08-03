@@ -59,9 +59,9 @@ kotlin {
 
 tasks {
     val javadocJar by registering(Jar::class) {
-        dependsOn(dokkaHtml)
+        dependsOn(dokkaGenerate)
         archiveClassifier.set("javadoc")
-        from(dokkaHtml)
+        from(dokka.dokkaPublications.html.map { it.outputDirectory })
     }
 }
 
